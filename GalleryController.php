@@ -38,41 +38,7 @@ class GalleryController extends Controller
      */
     public function store(Request $request)
     {
-        $output_dir = "gallery/photo";
-        if(isset($_FILES["myfile"]))
-        {
-            $ret = array();
-            
-        //  This is for custom errors;  
-        /*  $custom_error= array();
-            $custom_error['jquery-upload-file-error']="File already exists";
-            echo json_encode($custom_error);
-            die();
-        */
-            $error =$_FILES["myfile"]["error"];
-            //You need to handle  both cases
-            //If Any browser does not support serializing of multiple files using FormData() 
-            if(!is_array($_FILES["myfile"]["name"])) //single file
-            {
-                $fileName = $_FILES["myfile"]["name"];
-                move_uploaded_file($_FILES["myfile"]["tmp_name"],$output_dir.$fileName);
-                $ret[]= $fileName;
-            }
-            else  //Multiple files, file[]
-            {
-              $fileCount = count($_FILES["myfile"]["name"]);
-              for($i=0; $i < $fileCount; $i++)
-              {
-                $fileName = $_FILES["myfile"]["name"][$i];
-                move_uploaded_file($_FILES["myfile"]["tmp_name"][$i],$output_dir.$fileName);
-                $ret[]= $fileName;
-              }
-            
-            }
-            echo json_encode($ret);
-         }
-
-        /*$validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(),[
             'image' =>  'required',
             ]);
 
@@ -84,10 +50,9 @@ class GalleryController extends Controller
 
         $gallery_name =   $request->input('gallery_name');
         
-        $files       =   $request->file('image');
-        dd($files);
+        $files       =   $request->file('myfile');
         
-        $captions     =   $request->input('caption');  
+        //$captions     =   $request->input('caption');  
        
         if(empty($gallery_name)){
             //if no gallery is named, then
@@ -96,8 +61,9 @@ class GalleryController extends Controller
 
         $gallery = new Gallery;
         $gallery->name = $gallery_name;
-        $gallery->save();               //save gallery for once
+        $gallery->save();               //save gallery for once in gallery table
 
+        //for image counting, files is in array so used array_filter($files)
         for($i=0; $i<count(array_filter($files)); $i++) {
             $filename = uniqid() . $files[$i]->getClientOriginalName();
             
@@ -118,7 +84,7 @@ class GalleryController extends Controller
             //gallery id is passed automatically to image table
             
         //Session::flash('flash_message','Image succesfully Updated');
-        //return redirect('/galery');*/
+        //return redirect('/galery');
     }
 
     /**
